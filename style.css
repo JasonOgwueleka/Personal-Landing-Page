@@ -1,0 +1,533 @@
+/* ============================================
+   TOKENS
+   ============================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:    #f5f5f7;
+  --ink:   #1d1d1f;
+  --body:  #6e6e73;
+  --muted: #86868b;
+  --line:  rgba(0, 0, 0, 0.08);
+  --raise: #ffffff;
+  --chip:  #f0f0f2;
+  --tile:  #1d1d1f;
+  --blue:  #0071e3;
+  /* Mid grey for the signup CTA. White type over it clears AA at 5.08:1 —
+     anything lighter needs dark type instead. */
+  --grey:  #6e6e73;
+  /* Visible grey ring for the header photo. --line is too faint to read as a
+     border at this size; this is the same grey Apple uses for hairlines. */
+  --ring:  #d2d2d7;
+  --grey-hover: #5b5b60;
+  --success: #1f7a4d;
+  --error:   #c4321c;
+
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+}
+
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.5;
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: inherit; }
+img { max-width: 100%; }
+
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: clamp(64px, 10vw, 112px) clamp(20px, 5vw, 42px) 48px;
+  animation: fadeUp 0.5s ease-out both;
+}
+
+/* ============================================
+   WORDMARK
+   ============================================ */
+.brand { text-align: center; margin-bottom: clamp(48px, 8vw, 78px); }
+
+/* photo slot — the silhouette is the background, so it shows until a real
+   image loads over it (a missing file removes its own <img>) */
+.avatar {
+  width: clamp(96px, calc(72px + 5vw), 128px);
+  height: clamp(96px, calc(72px + 5vw), 128px);
+  margin: 0 auto clamp(22px, 3vw, 30px);
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--raise) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c7c7cc'%3E%3Ccircle cx='12' cy='9' r='4'/%3E%3Cpath d='M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z'/%3E%3C/svg%3E") center 60% / 62% no-repeat;
+  box-shadow: 0 0 0 3px var(--ring), 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+.avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.wordmark {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.9rem, calc(1.8rem + 5vw), 5.4rem);
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+  color: var(--ink);
+}
+
+.standfirst {
+  margin: 20px auto 0;
+  max-width: 24em;
+  font-weight: 600;
+  font-size: clamp(1.2rem, calc(0.85rem + 1.5vw), 1.75rem);
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--body);
+  text-wrap: balance;
+}
+
+.standfirst-sub {
+  margin: 12px auto 0;
+  /* Wide enough to hold the line in one piece on desktop — the sentence needs
+     roughly 42em and the old 34em cap was what broke it. Still a cap, not
+     `none`, so the measure stays bounded; below ~700px viewport the line no
+     longer fits and wraps on its own, which is what text-wrap: balance is for. */
+  max-width: 48em;
+  font-size: clamp(0.95rem, calc(0.8rem + 0.4vw), 1.05rem);
+  line-height: 1.45;
+  color: var(--muted);
+  text-wrap: balance;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+/* One column: every card is a full-width bar, in document order. The cards
+   used to sit two-up, which is why .venture-wide and .tile still carry
+   `grid-column: 1 / -1` — a no-op at one column, and what they'd need again
+   if this ever goes back to two. */
+.stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+
+.venture-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 112px;
+  padding: 20px;
+  border-radius: 22px;
+  background: var(--raise);
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+a.venture-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.07);
+}
+
+.venture-wide { grid-column: 1 / -1; }
+
+/* With the photo gone the About heading sits over a full-width text column,
+   so it reads better centred, with the cert chips centred under it. The
+   paragraph between them keeps the left edge it shares with the cards above.
+   The underline is offset off the baseline so it clears the descender in the
+   rest of the card rather than crowding the type. */
+.venture-wide .venture-name {
+  text-align: center;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+/* The shared .venture-line sets a 3px gap, which is right when the name and
+   line are one tight pair. Here the underline needs clearing and the
+   paragraph is a block of its own, so it gets real air. */
+.venture-wide .venture-line {
+  margin-top: 14px;
+  /* No measure cap — the paragraph fills the card's content box. The page's
+     own 980px max-width is what bounds the line length now. */
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.venture-wide .venture-routes { justify-content: center; }
+
+/* logo tiles ship as full-bleed black squares, so they fill the slot rather
+   than sitting padded on a white chip */
+.venture-logo {
+  flex: 0 0 60px;
+  width: 60px;
+  height: 60px;
+  border-radius: 15px;
+  overflow: hidden;
+  background: var(--tile);
+}
+.venture-logo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.venture-copy { min-width: 0; flex: 1; }
+
+.venture-name {
+  display: block;
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.venture-line {
+  display: block;
+  margin-top: 3px;
+  color: var(--body);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+/* The arrow is the only affordance these cards have left now that the
+   Subscribe button is gone, so it sits in a chip rather than floating as a
+   bare glyph. It inverts to the same near-black as the logo tiles on hover,
+   which ties the two ends of the row together. Drawn as an SVG because the
+   → glyph's weight and baseline shift between platform fonts. */
+.venture-arrow {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--chip);
+  color: var(--ink);
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.venture-arrow svg { display: block; width: 18px; height: 18px; }
+
+a.venture-row:hover .venture-arrow {
+  background: var(--tile);
+  color: #fff;
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .venture-arrow { transition: none; }
+  a.venture-row:hover .venture-arrow { transform: none; }
+}
+
+.venture-routes { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+
+.venture-route,
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 13px;
+  border: none;
+  border-radius: 999px;
+  background: var(--grey);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.venture-route:hover,
+.pill-btn:hover { background: var(--grey-hover); }
+
+.cert-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0 13px 0 5px;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--ink);
+  font-size: 0.76rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.cert-chip img { width: 24px; height: 24px; object-fit: contain; }
+
+/* ============================================
+   PHOTO TILE
+   The image is the card. Text sits on the image under a gradient that runs
+   to a hard dark at the bottom so white type holds over any thumbnail.
+   ============================================ */
+.tile {
+  position: relative;
+  display: block;
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  width: 100%;
+  aspect-ratio: 19 / 10;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--tile);
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.tile:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(26, 26, 24, 0.16); }
+
+.tile .photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.badge {
+  position: absolute;
+  top: clamp(14px, 1.3vw, 20px);
+  left: clamp(14px, 1.3vw, 20px);
+  width: clamp(44px, calc(30px + 2.8vw), 62px);
+  height: clamp(44px, calc(30px + 2.8vw), 62px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(7px, 0.7vw, 11px);
+  border-radius: clamp(9px, 0.9vw, 13px);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.badge svg { width: 100%; height: 100%; }
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(12, 12, 11, 0.90) 0%,
+    rgba(12, 12, 11, 0.62) 28%,
+    rgba(12, 12, 11, 0.18) 56%,
+    rgba(12, 12, 11, 0.06) 100%);
+}
+
+.txt {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: clamp(16px, calc(9px + 1.2vw), 26px) clamp(18px, calc(10px + 1.4vw), 30px);
+}
+
+.t-name {
+  display: block;
+  margin-bottom: 3px;
+  font-size: clamp(1.05rem, calc(0.72rem + 1.6vw), 1.72rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.t-line {
+  display: block;
+  font-size: clamp(0.88rem, calc(0.6rem + 1.35vw), 1.47rem);
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* ============================================
+   CONTACT
+   ============================================ */
+.signup { margin-top: 64px; text-align: center; }
+
+.signup-lead {
+  margin: 0 auto;
+  max-width: 22em;
+  font-size: 0.96rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.signup .pill-btn {
+  margin-top: 16px;
+  min-height: 40px;
+  padding: 0 20px;
+  font-size: 0.88rem;
+}
+
+/* ============================================
+   SOCIALS + FOOTER
+   ============================================ */
+.connect {
+  margin-top: 54px;
+  text-align: center;
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.socials {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--raise);
+  color: var(--muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.socials a:hover { background: var(--ink); color: #fff; }
+.socials svg { width: 17px; height: 17px; display: block; }
+
+.foot {
+  margin-top: 44px;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* ============================================
+   ENQUIRY MODAL
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(29, 29, 31, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.modal-overlay.open { opacity: 1; visibility: visible; }
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px 28px 24px;
+  border-radius: 28px;
+  background: var(--raise);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.2s ease;
+}
+.modal-overlay.open .modal { transform: none; }
+
+.modal h2 {
+  padding-right: 32px;
+  font-family: var(--display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.modal-note { margin-top: 6px; font-size: 0.9rem; color: var(--body); }
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--body);
+  background: var(--chip);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.modal-close:hover { background: var(--ink); color: #fff; }
+
+.contact-form { display: flex; flex-direction: column; gap: 14px; margin-top: 22px; }
+.form-row { display: flex; flex-direction: column; gap: 6px; }
+
+label { font-size: 0.8rem; font-weight: 500; color: var(--ink); }
+.optional { color: var(--muted); font-weight: 400; }
+.required { color: var(--blue); }
+
+input, textarea, select {
+  width: 100%;
+  padding: 11px 14px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--blue);
+  background: var(--raise);
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 38px;
+}
+
+textarea { resize: vertical; min-height: 110px; }
+
+.submit-btn {
+  align-self: center;
+  margin-top: 6px;
+  min-height: 40px;
+  padding: 0 22px;
+  font-size: 0.88rem;
+}
+.submit-btn:disabled { opacity: 0.6; cursor: default; }
+
+.form-note { min-height: 18px; font-size: 0.82rem; text-align: center; color: var(--body); }
+.form-note.success { color: var(--success); }
+.form-note.error { color: var(--error); }
+
+/* ============================================
+   MOTION + RESPONSIVE
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .page { animation: none; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+}
+
+@media (max-width: 480px) {
+  .page { padding-top: 58px; }
+  .stack { gap: 12px; }
+  .venture-row { min-height: 94px; padding: 16px; border-radius: 18px; }
+  .tile { border-radius: 24px; }
+  .venture-logo { flex-basis: 52px; width: 52px; height: 52px; }
+  .modal { padding: 28px 20px 20px; border-radius: 24px; }
+}

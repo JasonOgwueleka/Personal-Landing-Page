@@ -1,5 +1,36 @@
 // Footer year
 document.getElementById('year').textContent = new Date().getFullYear();
+
+// Enquiry modal — open on button click, close on X / overlay / Escape
+const modal = document.getElementById('enquiry-modal');
+const openBtn = document.getElementById('enquiry-open');
+const closeBtn = document.getElementById('enquiry-close');
+
+function openModal() {
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  const firstField = modal.querySelector('input, textarea, select');
+  if (firstField) firstField.focus();
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  if (openBtn) openBtn.focus();
+}
+
+if (modal && openBtn) {
+  openBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+}
  
 // Contact form — submit via fetch so the user gets inline feedback
 // instead of being redirected to Formspree's page.
@@ -44,7 +75,7 @@ if (form) {
       statusEl.className = 'form-note error';
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Send message';
+      submitBtn.textContent = 'Send enquiry';
     }
   });
 }
