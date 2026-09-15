@@ -39,6 +39,24 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Grid backdrop: faint 32px lines behind the whole page, fading out toward
+   the bottom so the cards stay the focus. Fixed, so it doesn't scroll. Delete
+   this block to go back to the plain background. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center top;
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 40%, transparent 100%);
+          mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 40%, transparent 100%);
+}
+
 a { color: inherit; }
 img { max-width: 100%; }
 
@@ -123,6 +141,7 @@ img { max-width: 100%; }
   min-height: 112px;
   padding: 20px;
   border-radius: 22px;
+  border: 1px solid var(--ring);
   background: var(--raise);
   text-decoration: none;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
@@ -259,6 +278,38 @@ a.venture-row:hover .venture-arrow {
 .cert-chip img { width: 24px; height: 24px; object-fit: contain; }
 
 /* ============================================
+   NEWSLETTER
+   Same row as the other cards, with the signup form wrapping onto its own
+   full-width line under the logo and copy.
+   ============================================ */
+.newsletter { flex-wrap: wrap; }
+
+.newsletter-form { flex: 1 1 100%; margin-top: 4px; }
+
+.newsletter-fields { display: flex; gap: 12px; }
+.newsletter-fields input { flex: 1; min-width: 0; }
+
+.newsletter-btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 20px;
+  font-size: 0.88rem;
+}
+.newsletter-btn:disabled { opacity: 0.6; cursor: default; }
+
+.newsletter-status { margin-top: 8px; text-align: left; }
+.newsletter-status:empty { display: none; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ============================================
    PHOTO TILE
    The image is the card. Text sits on the image under a gradient that runs
    to a hard dark at the bottom so white type holds over any thumbnail.
@@ -271,6 +322,7 @@ a.venture-row:hover .venture-arrow {
   width: 100%;
   aspect-ratio: 19 / 10;
   border-radius: 28px;
+  border: 1px solid var(--ring);
   overflow: hidden;
   background: var(--tile);
   text-decoration: none;
@@ -357,6 +409,16 @@ a.venture-row:hover .venture-arrow {
   min-height: 40px;
   padding: 0 20px;
   font-size: 0.88rem;
+}
+
+/* Black ring with a gap, on the page's main calls to action. Outline rather
+   than border so the gap shows whatever sits behind (grey page or white card)
+   and follows each element's border-radius without changing its size. */
+.signup .pill-btn,
+.newsletter-btn,
+.submit-btn {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
 }
 
 /* ============================================

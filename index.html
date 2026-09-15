@@ -13,7 +13,7 @@
   <meta property="og:description" content="Security Engineer. Helping agencies and developers ship secure projects without slowing down the build." />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="style.css?v=19" />
+  <link rel="stylesheet" href="style.css?v=25" />
 </head>
 <body>
   <main class="page">
@@ -42,14 +42,23 @@
       </a>
 
       <!-- ===== NEWSLETTER ===== -->
-      <a class="venture-row" href="https://YOUR-KIT-HANDLE.kit.com" target="_blank" rel="noopener noreferrer">
+      <!-- Posts straight to the Kit form (id 9920107). script.js submits it with
+           fetch for inline feedback; without JS it still posts to Kit directly. -->
+      <section class="venture-row newsletter" aria-labelledby="newsletter-title">
         <span class="venture-logo"><img src="images/kit-logo-dark.png" alt="" /></span>
         <div class="venture-copy">
-          <h2 class="venture-name">The appsec Brief</h2>
+          <h2 class="venture-name" id="newsletter-title">The appsec Brief</h2>
           <p class="venture-line">Real vulnerabilities I find and the fix. Sent when I find something worth sharing.</p>
         </div>
-        <span class="venture-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h12.5M11.5 6 17.5 12l-6 6"/></svg></span>
-      </a>
+        <form class="newsletter-form" action="https://app.kit.com/forms/9920107/subscriptions" method="post">
+          <label for="newsletter-email" class="visually-hidden">Email address</label>
+          <div class="newsletter-fields">
+            <input type="email" id="newsletter-email" name="email_address" placeholder="Email address" required autocomplete="email" />
+            <button type="submit" class="pill-btn newsletter-btn">Subscribe</button>
+          </div>
+          <p class="form-note newsletter-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
 
       <!-- ===== ABOUT ===== -->
       <section class="venture-row venture-wide" aria-labelledby="about-title">
@@ -164,6 +173,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=4"></script>
+  <script src="script.js?v=5"></script>
 </body>
 </html>

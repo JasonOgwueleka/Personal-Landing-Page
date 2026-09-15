@@ -1,6 +1,49 @@
 // Footer year
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// Newsletter — submit to Kit via fetch so the visitor stays on the page.
+// Kit replies with JSON: { status: "success" } or { status: "failed", errors: { messages: [...] } }.
+const newsletterForm = document.querySelector('.newsletter-form');
+
+if (newsletterForm) {
+  const newsletterStatus = newsletterForm.querySelector('.newsletter-status');
+  const newsletterBtn = newsletterForm.querySelector('.newsletter-btn');
+
+  newsletterForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    newsletterBtn.disabled = true;
+    newsletterBtn.textContent = 'Subscribing…';
+    newsletterStatus.textContent = '';
+    newsletterStatus.className = 'form-note newsletter-status';
+
+    try {
+      const response = await fetch(newsletterForm.action, {
+        method: 'POST',
+        body: new FormData(newsletterForm),
+        headers: { Accept: 'application/json' },
+      });
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        newsletterStatus.textContent = 'Almost there. Check your inbox to confirm your subscription.';
+        newsletterStatus.className = 'form-note newsletter-status success';
+        newsletterForm.reset();
+      } else {
+        const message = data.errors && data.errors.messages && data.errors.messages[0];
+        newsletterStatus.textContent = message || 'Something went wrong. Please try again.';
+        newsletterStatus.className = 'form-note newsletter-status error';
+      }
+    } catch (err) {
+      newsletterStatus.textContent = 'Something went wrong. Please try again.';
+      newsletterStatus.className = 'form-note newsletter-status error';
+    } finally {
+      newsletterBtn.disabled = false;
+      newsletterBtn.textContent = 'Subscribe';
+    }
+  });
+}
+
 // Enquiry modal — open on button click, close on X / overlay / Escape
 const modal = document.getElementById('enquiry-modal');
 const openBtn = document.getElementById('enquiry-open');
