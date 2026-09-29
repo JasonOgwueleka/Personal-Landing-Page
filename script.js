@@ -87,11 +87,7 @@ if (form) {
     const endpoint = form.getAttribute('action');
     const submitBtn = form.querySelector('.submit-btn');
  
-    if (!endpoint || endpoint.includes('YOUR_FORM_ID')) {
-      statusEl.textContent = 'Form endpoint not configured yet — add your Formspree ID in index.html.';
-      statusEl.className = 'form-note error';
-      return;
-    }
+    // The endpoint is the Netlify function, which holds the Resend key.
  
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending…';
@@ -101,16 +97,17 @@ if (form) {
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
-        body: new FormData(form),
-        headers: { Accept: 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       });
- 
+      const data = await response.json().catch(() => ({}));
+
       if (response.ok) {
         statusEl.textContent = 'Message sent — I\'ll get back to you shortly.';
         statusEl.className = 'form-note success';
         form.reset();
       } else {
-        statusEl.textContent = 'Something went wrong. Please try again or email me directly.';
+        statusEl.textContent = data.error || 'Something went wrong. Please try again or email me directly.';
         statusEl.className = 'form-note error';
       }
     } catch (err) {
