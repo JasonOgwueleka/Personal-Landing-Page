@@ -82,8 +82,8 @@ img { max-width: 100%; }
 /* photo slot — the silhouette is the background, so it shows until a real
    image loads over it (a missing file removes its own <img>) */
 .avatar {
-  width: clamp(96px, calc(72px + 5vw), 128px);
-  height: clamp(96px, calc(72px + 5vw), 128px);
+  width: clamp(132px, calc(100px + 8vw), 176px);
+  height: clamp(132px, calc(100px + 8vw), 176px);
   margin: 0 auto clamp(22px, 3vw, 30px);
   border-radius: 50%;
   overflow: hidden;
